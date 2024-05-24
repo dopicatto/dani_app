@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin1
+      POSTGRES_DB: visitors
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/visitors
+    depends_on:
+      - db

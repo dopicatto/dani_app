@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Test
+      run: |
+        python -m unittest discover -s tests
+
+    - name: Build Docker image
+      run: |
+        docker build -t your_dockerhub_username/your_image_name:latest .
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker image
+      run: docker push your_dockerhub_username/your_image_name:latest
+
+    - name: Deploy with Terraform
+      run: |
+        cd terraform
+        terraform init
+        terraform apply -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
