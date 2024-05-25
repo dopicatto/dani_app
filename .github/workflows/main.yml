@@ -44,20 +44,12 @@ jobs:
     - name: Push Docker image
       run: docker push dpicatto/dani_app:latest
 
-    - name: Verify Docker login
-      run: |
-        docker info
-        cat ~/.docker/config.json
-
-    - name: Push Docker image
-      run: |
-        docker push dpicatto/dani_app:latest
-
     - name: Set up Terraform
       run: |
         cd terraform
         terraform init
         terraform import azurerm_resource_group.dani_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources || true
+        terraform import azurerm_postgresql_server.dani_app_db /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources/providers/Microsoft.DBforPostgreSQL/servers/daniapppsqlserver || true
         terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
