@@ -3,12 +3,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "dani_app" {
-  name     = "dani_app-resources"
+  name     = "dani_app_resources"
   location = "West Europe"
 }
 
 resource "azurerm_postgresql_server" "dani_app_db" {
-  name                = "dani_app-psqlserver"
+  name                = "daniapppsqlserver"
   location            = azurerm_resource_group.dani_app.location
   resource_group_name = azurerm_resource_group.dani_app.name
 
@@ -36,13 +36,13 @@ resource "azurerm_postgresql_database" "dani_app_db" {
 }
 
 resource "azurerm_container_group" "dani_app" {
-  name                = "dani_app-containergroup"
+  name                = "dani_app_containergroup"
   location            = azurerm_resource_group.dani_app.location
   resource_group_name = azurerm_resource_group.dani_app.name
   os_type             = "Linux"
 
   container {
-    name   = "dani_app-container"
+    name   = "dani_app_container"
     image  = "dpicatto/dani_app:latest"
     cpu    = "0.5"
     memory = "1.5"
