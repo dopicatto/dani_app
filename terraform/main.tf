@@ -44,7 +44,7 @@ resource "azurerm_container_group" "dani_app" {
   ip_address_type     = "Public"
 
   container {
-    name   = "dani_app_container"
+    name   = "daniappcontainer"
     image  = "dpicatto/dani_app:latest"
     cpu    = "0.5"
     memory = "1.5"

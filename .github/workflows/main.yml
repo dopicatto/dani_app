@@ -1,65 +1,58 @@
-provider "azurerm" {
-  features {}
-}
+name: CI/CD Pipeline
 
-resource "azurerm_resource_group" "dani_app" {
-  name     = "dani_app_resources"
-  location = "West Europe"
-}
+on:
+  push:
+    branches:
+      - main
 
-resource "azurerm_postgresql_server" "dani_app_db" {
-  name                = "daniapppsqlserver"
-  location            = azurerm_resource_group.dani_app.location
-  resource_group_name = azurerm_resource_group.dani_app.name
+jobs:
+  build:
 
-  administrator_login          = "psqladmin"
-  administrator_login_password = "AdminPassword123!"
+    runs-on: ubuntu-latest
 
-  sku_name   = "B_Gen5_1"
-  version    = "11"
-  storage_mb = 5120
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-  backup_retention_days        = 7
-  geo_redundant_backup_enabled = false
-  auto_grow_enabled            = true
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
 
-  public_network_access_enabled = true
-  ssl_enforcement_enabled       = true
-}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-resource "azurerm_postgresql_database" "dani_app_db" {
-  name                = "exampledb"
-  resource_group_name = azurerm_resource_group.dani_app.name
-  server_name         = azurerm_postgresql_server.dani_app_db.name
-  charset             = "UTF8"
-  collation           = "English_United States.1252"
-}
+    - name: Test
+      run: |
+        python -m unittest discover -s tests
 
-resource "azurerm_container_group" "dani_app" {
-  name                = "dani_app_containergroup"
-  location            = azurerm_resource_group.dani_app.location
-  resource_group_name = azurerm_resource_group.dani_app.name
-  os_type             = "Linux"
-  dns_name_label      = "daniappcontainergroup"
-  ip_address_type     = "Public"
+    - name: Build Docker image
+      run: |
+        docker build -t dpicatto/dani_app:latest .
 
-  container {
-    name   = "daniappcontainer"
-    image  = "dpicatto/dani_app:latest"
-    cpu    = "0.5"
-    memory = "1.5"
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    ports {
-      port     = 5000
-      protocol = "TCP"
-    }
+    - name: Verify Docker login
+      run: |
+        docker info
+        cat ~/.docker/config.json
 
-    environment_variables = {
-      DATABASE_URL = "postgresql://psqladmin:AdminPassword123!@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
-    }
-  }
+    - name: Push Docker image
+      run: |
+        docker push dpicatto/dani_app:latest
 
-  tags = {
-    environment = "testing"
-  }
-}
+    - name: Set up Terraform
+      run: |
+        cd terraform
+        terraform init
+        terraform import azurerm_resource_group.dani_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources || true
+        terraform apply -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
