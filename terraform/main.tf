@@ -24,6 +24,7 @@ resource "azurerm_postgresql_server" "dani_app_db" {
   auto_grow_enabled            = true
 
   public_network_access_enabled = true
+  ssl_enforcement_enabled       = true  # Aquí se incluye el argumento obligatorio
 }
 
 resource "azurerm_postgresql_database" "dani_app_db" {
@@ -42,7 +43,7 @@ resource "azurerm_container_group" "dani_app" {
 
   container {
     name   = "dani_app-container"
-    image  = "dopicatto/dani_app:latest"
+    image  = "dpicatto/dani_app:latest"
     cpu    = "0.5"
     memory = "1.5"
 
