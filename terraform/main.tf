@@ -41,7 +41,7 @@ resource "azurerm_container_group" "dani_app" {
   resource_group_name = azurerm_resource_group.dani_app.name
   os_type             = "Linux"
   dns_name_label      = "daniappcontainergroup"  # Ensure this value is globally unique
-  ip_address_type     = "public"
+  ip_address_type     = "Public"  # Corrected case sensitivity
 
   container {
     name   = "dani_app_container"
