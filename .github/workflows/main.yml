@@ -42,6 +42,14 @@ jobs:
         cat ~/.docker/config.json
 
     - name: Push Docker image
+      run: docker push dopicatto/dani_app:latest
+
+    - name: Verify Docker login
+      run: |
+        docker info
+        cat ~/.docker/config.json
+
+    - name: Push Docker image
       run: |
         docker push dpicatto/dani_app:latest
 
