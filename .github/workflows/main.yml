@@ -45,10 +45,11 @@ jobs:
       run: |
         docker push dpicatto/dani_app:latest
 
-    - name: Deploy with Terraform
+    - name: Set up Terraform
       run: |
         cd terraform
         terraform init
+        terraform import azurerm_resource_group.dani_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources || true
         terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
