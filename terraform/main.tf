@@ -66,3 +66,4 @@ resource "azurerm_container_group" "dani_app" {
   }
 
   dns_name_label = "daniappcontainergroup" 
+}
