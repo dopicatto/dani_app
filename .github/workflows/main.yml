@@ -35,9 +35,14 @@ jobs:
     - name: Log in to Docker Hub
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Verify Docker login
+      run: |
         docker info
-        docker build -t dopicatto/dani_app:latest .
-        docker push dopicatto/dani_app:latest
+        cat ~/.docker/config.json
+
+    - name: Push Docker image
+      run: docker push dopicatto/dani_app:latest
 
     - name: Deploy with Terraform
       run: |
