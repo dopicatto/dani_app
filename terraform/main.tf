@@ -57,11 +57,10 @@ resource "azurerm_container_group" "dani_app" {
     }
   }
 
-  ip_address {
-    type            = "public"
-    ports {
-      port     = 5000
-      protocol = "TCP"
-    }
+  ip_address_type = "public"
+  dns_name_label  = "daniappcontainergroup"  # Asegúrate de que este valor sea único a nivel global
+  ports {
+    port     = 5000
+    protocol = "TCP"
   }
 }
