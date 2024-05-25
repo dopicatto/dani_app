@@ -30,7 +30,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t dpicatto/dani_app:latest .
+        docker build -t dopicatto/dani_app:latest .
 
     - name: Log in to Docker Hub
       run: |
@@ -39,15 +39,11 @@ jobs:
     - name: Verify Docker login
       run: |
         docker info
-<<<<<<< HEAD
         cat ~/.docker/config.json
 
     - name: Push Docker image
-      run: docker push dopicatto/dani_app:latest
-=======
-        docker build -t dpicatto/dani_app:latest .
-        docker push dpicatto/dani_app:latest
->>>>>>> 2e14921 (update mismatch user account docker)
+      run: |
+        docker push dopicatto/dani_app:latest
 
     - name: Deploy with Terraform
       run: |
