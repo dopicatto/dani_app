@@ -5,7 +5,7 @@ services:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin1
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: visitors
     ports:
       - "5432:5432"
