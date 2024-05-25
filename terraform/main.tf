@@ -13,7 +13,7 @@ resource "azurerm_postgresql_server" "dani_app_db" {
   resource_group_name = azurerm_resource_group.dani_app.name
 
   administrator_login          = "psqladmin"
-  administrator_login_password = "admin1"
+  administrator_login_password = "AdminPassword123!" 
 
   sku_name   = "B_Gen5_1"
   version    = "11"
@@ -40,8 +40,8 @@ resource "azurerm_container_group" "dani_app" {
   location            = azurerm_resource_group.dani_app.location
   resource_group_name = azurerm_resource_group.dani_app.name
   os_type             = "Linux"
-  dns_name_label      = "daniappcontainergroup"  # Ensure this value is globally unique
-  ip_address_type     = "Public"  # Corrected case sensitivity
+  dns_name_label      = "daniappcontainergroup"
+  ip_address_type     = "Public"
 
   container {
     name   = "dani_app_container"
@@ -55,7 +55,7 @@ resource "azurerm_container_group" "dani_app" {
     }
 
     environment_variables = {
-      DATABASE_URL = "postgresql://psqladmin:admin1@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
+      DATABASE_URL = "postgresql://psqladmin:AdminPassword123!@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
     }
   }
 
