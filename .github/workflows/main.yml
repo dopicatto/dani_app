@@ -30,13 +30,13 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t your_dockerhub_username/your_image_name:latest .
+        docker build -t dopicatto/dani_app:latest .
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Push Docker image
-      run: docker push your_dockerhub_username/your_image_name:latest
+      run: docker push dopicatto/dani_app:latest
 
     - name: Deploy with Terraform
       run: |

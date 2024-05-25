@@ -2,18 +2,18 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
+resource "azurerm_resource_group" "dani_app" {
+  name     = "dani_app-resources"
   location = "West Europe"
 }
 
-resource "azurerm_postgresql_server" "example" {
-  name                = "example-psqlserver"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_postgresql_server" "dani_app_db" {
+  name                = "dani_app-psqlserver"
+  location            = azurerm_resource_group.dani_app.location
+  resource_group_name = azurerm_resource_group.dani_app.name
 
   administrator_login          = "psqladmin"
-  administrator_login_password = "your_password"
+  administrator_login_password = "admin1"
 
   sku_name   = "B_Gen5_1"
   version    = "11"
@@ -26,23 +26,23 @@ resource "azurerm_postgresql_server" "example" {
   public_network_access_enabled = true
 }
 
-resource "azurerm_postgresql_database" "example" {
+resource "azurerm_postgresql_database" "dani_app_db" {
   name                = "exampledb"
-  resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_postgresql_server.example.name
+  resource_group_name = azurerm_resource_group.dani_app.name
+  server_name         = azurerm_postgresql_server.dani_app_db.name
   charset             = "UTF8"
   collation           = "English_United States.1252"
 }
 
-resource "azurerm_container_group" "example" {
-  name                = "example-containergroup"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_container_group" "dani_app" {
+  name                = "dani_app-containergroup"
+  location            = azurerm_resource_group.dani_app.location
+  resource_group_name = azurerm_resource_group.dani_app.name
   os_type             = "Linux"
 
   container {
-    name   = "example-aci"
-    image  = "your_dockerhub_username/your_image_name:latest"
+    name   = "dani_app-container"
+    image  = "dopicatto/dani_app:latest"
     cpu    = "0.5"
     memory = "1.5"
 
@@ -52,7 +52,7 @@ resource "azurerm_container_group" "example" {
     }
 
     environment_variables = {
-      DATABASE_URL = "postgresql://psqladmin:your_password@${azurerm_postgresql_server.example.fqdn}:5432/exampledb"
+      DATABASE_URL = "postgresql://psqladmin:admin1@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
     }
   }
 
