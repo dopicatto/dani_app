@@ -1,17 +1,16 @@
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-import os
 
 app = Flask(__name__)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:password@db:5432/visitors')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'DATABASE_URL', 
+    'postgresql://psqladmin%40daniapppsqlserver:AdminPassword123%21@daniapppsqlserver.postgres.database.azure.com:5432/exampledb?sslmode=require'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'connect_args': {
-        'sslmode': 'require'
-    }
-}
+
 db = SQLAlchemy(app)
 
 class Visitor(db.Model):
