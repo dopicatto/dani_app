@@ -47,10 +47,7 @@ jobs:
       run: |
         cd terraform
         terraform init
-        terraform import azurerm_resource_group.dani_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources || true
-        terraform import azurerm_postgresql_server.dani_app_db /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources/providers/Microsoft.DBforPostgreSQL/servers/daniapppsqlserver || true
-        terraform import azurerm_postgresql_database.dani_app_db /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources/providers/Microsoft.DBforPostgreSQL/servers/daniapppsqlserver/databases/exampledb || true
-        terraform import azurerm_container_group.dani_app /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/dani_app_resources/providers/Microsoft.ContainerInstance/containerGroups/dani_app_containergroup || true
+        bash ../import_resources.sh
         terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
