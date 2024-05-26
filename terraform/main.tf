@@ -55,7 +55,7 @@ resource "azurerm_container_group" "dani_app" {
     }
 
     environment_variables = {
-      DATABASE_URL = "postgresql://psqladmin:AdminPassword123!@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
+      DATABASE_URL = "postgresql://psqladmin@daniapppsqlserver:AdminPassword123!@${azurerm_postgresql_server.dani_app_db.fqdn}:5432/exampledb"
     }
   }
 
