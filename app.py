@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     'DATABASE_URL', 
-    'postgresql://psqladmin%40daniapppsqlserver:AdminPassword123%21@daniapppsqlserver.postgres.database.azure.com:5432/exampledb?sslmode=require'
+    'postgresql://psqladmin%40daniapppsqlserver:AdminPassword123%21@daniapppsqlserver.postgres.database.azure.com:5432/exampledb?sslmode=disable'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

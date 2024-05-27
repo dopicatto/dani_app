@@ -55,7 +55,7 @@ resource "azurerm_container_group" "dani_app" {
     }
 
     environment_variables = {
-      DATABASE_URL = "postgresql://psqladmin@daniapppsqlserver:<password>@20.61.99.196:5432/exampledb?slmode=disable"
+      DATABASE_URL = "postgresql://psqladmin@daniapppsqlserver:AdminPassword123!@daniapppsqlserver.postgres.database.azure.com:5432/exampledb?sslmode=disable"
     }
   }
 
