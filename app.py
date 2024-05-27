@@ -32,11 +32,17 @@ def create_tables():
 
 @app.route('/visit', methods=['POST'])
 def visit():
-    ip_address = request.remote_addr
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    app.logger.debug(f"Visitor IP address: {ip_address}")
+    for header in request.headers:
+        app.logger.debug(f"Header: {header}")
     if not Visitor.query.filter_by(ip_address=ip_address).first():
         new_visitor = Visitor(ip_address=ip_address)
         db.session.add(new_visitor)
         db.session.commit()
+        app.logger.debug(f"New visitor added with IP: {ip_address}")
+    else:
+        app.logger.debug(f"Visitor with IP {ip_address} already recorded")
     return 'Visit recorded', 200
 
 if __name__ == '__main__':
