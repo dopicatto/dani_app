@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ class Visitor(db.Model):
 @app.route('/')
 def home():
     unique_visitors = Visitor.query.count()
-    return f'Unique Visitors: {unique_visitors}'
+    return render_template('home.html', unique_visitors=unique_visitors)
 
 @app.route('/version')
 def version():
@@ -32,10 +32,8 @@ def create_tables():
 
 @app.route('/visit', methods=['POST'])
 def visit():
-    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    ip_address = request.remote_addr
     app.logger.debug(f"Visitor IP address: {ip_address}")
-    for header in request.headers:
-        app.logger.debug(f"Header: {header}")
     if not Visitor.query.filter_by(ip_address=ip_address).first():
         new_visitor = Visitor(ip_address=ip_address)
         db.session.add(new_visitor)

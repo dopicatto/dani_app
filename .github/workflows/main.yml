@@ -35,22 +35,26 @@ jobs:
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Verify Docker login
-      run: |
-        docker info
-        cat ~/.docker/config.json
-
     - name: Push Docker image
       run: docker push dpicatto/dani_app:latest
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Set up Terraform
-      run: |
-        cd terraform
-        terraform init
-        bash ../import_resources.sh
-        terraform apply -auto-approve
+      run: terraform init
+      working-directory: ./terraform
+
+    - name: Apply Terraform
+      run: terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      working-directory: ./terraform
