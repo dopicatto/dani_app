@@ -57,7 +57,7 @@ resource "azurerm_container_group" "dani_app" {
 
     environment_variables = {
       DB_NAME     = "exampledb"
-      DB_USER     = var.db_admin_user
+      DB_USER     = "${var.db_admin_user}@daniapppsqlserver"
       DB_PASSWORD = var.db_admin_password
       DB_HOST     = "daniapppsqlserver.postgres.database.azure.com"
       DB_PORT     = "5432"
