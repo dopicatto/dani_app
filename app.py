@@ -13,15 +13,26 @@ DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_PORT = os.getenv('DB_PORT', '5432')
 
+# Log the environment variables for debugging
+print(f"DB_NAME: {DB_NAME}")
+print(f"DB_USER: {DB_USER}")
+print(f"DB_PASSWORD: {DB_PASSWORD}")
+print(f"DB_HOST: {DB_HOST}")
+print(f"DB_PORT: {DB_PORT}")
+
 def get_db_connection():
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
-    return conn
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        raise
 
 def create_table():
     conn = get_db_connection()
@@ -37,13 +48,16 @@ def create_table():
 
 @app.route('/')
 def main_page():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM visitors")
-    unique_visitors = cur.fetchone()[0]
-    cur.close()
-    conn.close()
-    return f"<h1>Unique Visitors: {unique_visitors}</h1>"
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM visitors")
+        unique_visitors = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        return f"<h1>Unique Visitors: {unique_visitors}</h1>"
+    except Exception as e:
+        return f"Error: {e}"
 
 @app.route('/version')
 def version():
@@ -52,20 +66,22 @@ def version():
 @app.before_request
 def track_visitor():
     ip_address = request.args.get('ip', request.remote_addr)
-    conn = get_db_connection()
-    cur = conn.cursor()
     try:
+        conn = get_db_connection()
+        cur = conn.cursor()
         cur.execute(
             sql.SQL("INSERT INTO visitors (ip_address) VALUES (%s) ON CONFLICT (ip_address) DO NOTHING"),
             [ip_address]
         )
         conn.commit()
-    except Exception as e:
-        print(f"Error tracking visitor: {e}")
-    finally:
         cur.close()
         conn.close()
+    except Exception as e:
+        print(f"Error tracking visitor: {e}")
 
 if __name__ == '__main__':
-    create_table()
-    app.run(host='0.0.0.0', port=5000)
+    try:
+        create_table()
+        app.run(host='0.0.0.0', port=5000)
+    except Exception as e:
+        print(f"Failed to start application: {e}")
