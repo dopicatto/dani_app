@@ -7,6 +7,7 @@ app = Flask(__name__)
 app_version = "1.0.0"
 
 # Database connection parameters from environment variables
+
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -14,6 +15,7 @@ DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 
 # Log the environment variables for debugging
+
 print(f"DB_NAME: {DB_NAME}")
 print(f"DB_USER: {DB_USER}")
 print(f"DB_PASSWORD: {DB_PASSWORD}")
@@ -21,6 +23,13 @@ print(f"DB_HOST: {DB_HOST}")
 print(f"DB_PORT: {DB_PORT}")
 
 def get_db_connection():
+    """
+    Establish a connection to the PostgreSQL database using environment variables.
+    Returns:
+        conn: A psycopg2 connection object.
+    Raises:
+        Exception: If there is an error connecting to the database.
+    """
     try:
         conn = psycopg2.connect(
             dbname=DB_NAME,
@@ -35,6 +44,10 @@ def get_db_connection():
         raise
 
 def create_table():
+    """
+    Create the 'visitors' table if it does not exist.
+    The table stores the IP addresses of visitors.
+    """
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
@@ -48,6 +61,11 @@ def create_table():
 
 @app.route('/')
 def main_page():
+    """
+    Main page route that displays the count of unique visitors.
+    Returns:
+        str: HTML string displaying the unique visitors count.
+    """
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -61,10 +79,19 @@ def main_page():
 
 @app.route('/version')
 def version():
+    """
+    Version route that returns the current version of the application.
+    Returns:
+        json: JSON object containing the application version.
+    """
     return jsonify(version=app_version)
 
 @app.before_request
 def track_visitor():
+    """
+    Track each visitor's IP address before handling the request.
+    The IP address is either obtained from query parameters or from the request remote address.
+    """
     ip_address = request.args.get('ip', request.remote_addr)
     try:
         conn = get_db_connection()
@@ -81,7 +108,7 @@ def track_visitor():
 
 if __name__ == '__main__':
     try:
-        create_table()
-        app.run(host='0.0.0.0', port=5000)
+        create_table()  # Ensure the visitors table is created before starting the app
+        app.run(host='0.0.0.0', port=5000)  # Run the app on all available IP addresses, port 5000
     except Exception as e:
         print(f"Failed to start application: {e}")

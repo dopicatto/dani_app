@@ -2,30 +2,30 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build: .  # Build the Docker image for the web service from the Dockerfile in the current directory
     ports:
-      - "5000:5000"
+      - "5000:5000"  # Map port 5000 of the host to port 5000 of the container
     env_file:
-      - .env
-    depends_on:
+      - .env  # Load environment variables from the .env file
+    depends_on:  # Ensure the web service starts only after the db service is healthy
       db:
-        condition: service_healthy
+        condition: service_healthy  # The web service depends on the health status of the db service
 
   db:
-    image: postgres:13
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+    image: postgres:13  # Use the official PostgreSQL 13 image for the db service
+    environment:  # Set environment variables for the PostgreSQL container
+      DB_NAME: ${DB_NAME}  # Database name from .env file
+      DB_USER: ${DB_USER}  # Database user from .env file
+      DB_PASSWORD: ${DB_PASSWORD}  # Database password from .env file
+      DB_HOST: ${DB_HOST}  # Database host from .env file
+      DB_PORT: ${DB_PORT}  # Database port from .env file
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data in a named volume
+    healthcheck:  # Define a health check for the PostgreSQL container
+      test: ["CMD-SHELL", "pg_isready -U postgres"]  # Command to check if PostgreSQL is ready
+      interval: 10s  # Time between health check executions
+      timeout: 5s  # Time to wait for a health check to succeed
+      retries: 5  # Number of retries before considering the container unhealthy
 
 volumes:
-  postgres_data:
+  postgres_data:  # Named volume to persist PostgreSQL data
